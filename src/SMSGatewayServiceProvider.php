@@ -1,10 +1,10 @@
 <?php
 
-namespace Osonsms\Gateway;
+namespace OsonSMS\SMSGateway;
 
 use Illuminate\Support\ServiceProvider;
 
-class GatewayServiceProvider extends ServiceProvider
+class SMSGatewayServiceProvider extends ServiceProvider
 {
     /**
      * Bootstrap the application services.
@@ -14,14 +14,14 @@ class GatewayServiceProvider extends ServiceProvider
         /*
          * Optional methods to load your package assets
          */
-        // $this->loadTranslationsFrom(__DIR__.'/../resources/lang', 'gateway');
-        // $this->loadViewsFrom(__DIR__.'/../resources/views', 'gateway');
+        // $this->loadTranslationsFrom(__DIR__.'/../resources/lang', 'smsgateway');
+        // $this->loadViewsFrom(__DIR__.'/../resources/views', 'smsgateway');
         // $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
         // $this->loadRoutesFrom(__DIR__.'/routes.php');
 
         if ($this->app->runningInConsole()) {
             $this->publishes([
-                __DIR__.'/../config/config.php' => config_path('gateway.php'),
+                __DIR__.'/../config/config.php' => config_path('smsgateway.php'),
             ], 'config');
 
             // Export the migration
@@ -33,17 +33,17 @@ class GatewayServiceProvider extends ServiceProvider
             }
             // Publishing the views.
             /*$this->publishes([
-                __DIR__.'/../resources/views' => resource_path('views/vendor/gateway'),
+                __DIR__.'/../resources/views' => resource_path('views/vendor/smsgateway'),
             ], 'views');*/
 
             // Publishing assets.
             /*$this->publishes([
-                __DIR__.'/../resources/assets' => public_path('vendor/gateway'),
+                __DIR__.'/../resources/assets' => public_path('vendor/smsgateway'),
             ], 'assets');*/
 
             // Publishing the translation files.
             /*$this->publishes([
-                __DIR__.'/../resources/lang' => resource_path('lang/vendor/gateway'),
+                __DIR__.'/../resources/lang' => resource_path('lang/vendor/smsgateway'),
             ], 'lang');*/
 
             // Registering package commands.
@@ -57,11 +57,11 @@ class GatewayServiceProvider extends ServiceProvider
     public function register()
     {
         // Automatically apply the package configuration
-        $this->mergeConfigFrom(__DIR__.'/../config/config.php', 'gateway');
+        $this->mergeConfigFrom(__DIR__.'/../config/config.php', 'smsgateway');
 
         // Register the main class to use with the facade
-        $this->app->singleton('gateway', function () {
-            return new Gateway;
+        $this->app->singleton('smsgateway', function () {
+            return new SMSGateway;
         });
     }
 }

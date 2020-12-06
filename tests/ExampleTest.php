@@ -1,16 +1,16 @@
 <?php
 
-namespace Osonsms\Gateway\Tests;
+namespace OsonSMS\SMSGateway\Tests;
 
 use Orchestra\Testbench\TestCase;
-use Osonsms\Gateway\GatewayServiceProvider;
+use OsonSMS\SMSGateway\SMSGatewayServiceProvider;
 
 class ExampleTest extends TestCase
 {
 
     protected function getPackageProviders($app)
     {
-        return [GatewayServiceProvider::class];
+        return [SMSGatewayServiceProvider::class];
     }
     
     /** @test */

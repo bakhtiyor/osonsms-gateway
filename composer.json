@@ -1,11 +1,11 @@
 {
-    "name": "osonsms/gateway",
-    "description": "A package for sending SMS via OsonSMS API.",
+    "name": "osonsms/smsgateway",
+    "description": "A simple library for sending SMS via OsonSMS API.",
     "keywords": [
         "osonsms",
-        "gateway"
+        "smsgateway"
     ],
-    "homepage": "https://github.com/osonsms/gateway",
+    "homepage": "https://github.com/osonsms/smsgateway",
     "license": "MIT",
     "type": "library",
     "authors": [
@@ -16,7 +16,8 @@
         }
     ],
     "require": {
-        "php": "^7.1"
+        "php": "^7.1",
+        "illuminate/support": "^6.0"
     },
     "require-dev": {
         "orchestra/testbench": "^4.0",
@@ -24,12 +25,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Osonsms\\Gateway\\": "src"
+            "OsonSMS\\SMSGateway\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Osonsms\\Gateway\\Tests\\": "tests"
+            "OsonSMS\\SMSGateway\\Tests\\": "tests"
         }
     },
     "scripts": {
@@ -43,10 +44,10 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Osonsms\\Gateway\\GatewayServiceProvider"
+                "OsonSMS\\SMSGateway\\SMSGatewayServiceProvider"
             ],
             "aliases": {
-                "Gateway": "Osonsms\\Gateway\\GatewayFacade"
+                "SMSGateway": "OsonSMS\\SMSGateway\\SMSGatewayFacade"
             }
         }
     }

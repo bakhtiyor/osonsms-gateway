@@ -20,8 +20,9 @@ class CreateOsonsmsLogTable extends Migration
             $table->string('sender_name', 11);
             $table->string('message', 2500);
             $table->string('phonenumber', 13);
-            $table->string('server_response', 2500);
-            $table->tinyint('is_sent')->default(0);
+            $table->string('server_response', 2500)->nullable();
+            $table->string('msgid', 20)->nullable();
+            $table->tinyInteger('is_sent')->default(0);
             $table->timestamps();
         });
     }

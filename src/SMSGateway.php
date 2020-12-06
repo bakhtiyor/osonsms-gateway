@@ -1,10 +1,10 @@
 <?php
 
-namespace Osonsms\Gateway;
+namespace OsonSMS\SMSGateway;
 
 use Osonsms\Gateway\Models\OsonSMSLog;
 
-class Gateway
+class SMSGateway
 {
     public static function SendRequest($type, $url, $parameters)
     {
@@ -56,7 +56,6 @@ class Gateway
         $OsonSMSLog->save();
 
         $dlm = ";";
-        $login =
         $txn_id = "osonsms_laravel_".$OsonSMSLog->id;
         $str_hash = hash('sha256',$txn_id.$dlm.config('gateway.login').$dlm.config('gateway.sender_name').$dlm.$phonenumber.$dlm.config('gateway.hash'));
         $parameters = array(
@@ -67,6 +66,14 @@ class Gateway
             "txn_id" => $txn_id,
             "login"=>config('gateway.login'),
         );
-        return static::SendRequest("GET", config('gateway.server_url'), $parameters);
+        $result = static::SendRequest("GET", config('gateway.server_url').'/sendsms_v1.php', $parameters);
+        $_OsonSMSLog = OsonSMSLog::findOrFail($OsonSMSLog->id);
+        $_OsonSMSLog->server_response = $result['msg'];
+        $_OsonSMSLog->is_sent = 1;
+        $_OsonSMSLog->update();
+        if ((isset($result['error']) && $result['error'] == 0))
+            return true;
+        else
+            return false;
     }
 }

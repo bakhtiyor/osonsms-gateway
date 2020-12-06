@@ -1,13 +1,13 @@
 <?php
 
-namespace Osonsms\Gateway;
+namespace OsonSMS\SMSGateway;
 
 use Illuminate\Support\Facades\Facade;
 
 /**
- * @see \Osonsms\Gateway\Skeleton\SkeletonClass
+ * @see \OsonSMS\SMSGateway\Skeleton\SkeletonClass
  */
-class GatewayFacade extends Facade
+class SMSGatewayFacade extends Facade
 {
     /**
      * Get the registered name of the component.
@@ -16,6 +16,6 @@ class GatewayFacade extends Facade
      */
     protected static function getFacadeAccessor()
     {
-        return 'gateway';
+        return 'smsgateway';
     }
 }
