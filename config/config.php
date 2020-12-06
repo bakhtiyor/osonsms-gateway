@@ -1,11 +1,11 @@
 <?php
 
 /*
- * You can place your custom package configuration in here.
+ * You can register for FREE in https://osonsms.com in order to get access to OsonSMS gateway and send SMS via its gateway.
  */
 return [
     'login' => 'YOUR_LOGIN',                                    // your login in OsonSMS platform
     'hash' => 'YOUR_HASH',                                      // your hash code in OsonSMS platform
-    'sender' => 'OsonSMS',                                      // the name of your SMS sender
+    'sender_name' => 'OsonSMS',                                 // the name of your SMS sender
     'server_url' => 'http://api.osonsms.com/sendsms_v1.php'     // OsonSMS api server URL
 ];

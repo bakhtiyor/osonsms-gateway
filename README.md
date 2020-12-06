@@ -14,7 +14,11 @@ You can install the package via composer:
 ```bash
 composer require osonsms/gateway
 ```
+In order to publish migration files run following command:
+```bash
+php artisan vendor:publish --provider="Osonsms\Gateway\GatewayServiceProvider" --tag="migrations"
 
+```
 ## Usage
 
 ``` php

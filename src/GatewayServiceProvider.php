@@ -24,6 +24,13 @@ class GatewayServiceProvider extends ServiceProvider
                 __DIR__.'/../config/config.php' => config_path('gateway.php'),
             ], 'config');
 
+            // Export the migration
+            if (! class_exists('CreateOsonsmsLogTable')) {
+                $this->publishes([
+                    __DIR__ . '/../database/migrations/create_osonsms_log_table.php.stub' => database_path('migrations/' . date('Y_m_d_His', time()) . '_create_osonsms_log_table.php'),
+                    // you can add any number of migrations here
+                ], 'migrations');
+            }
             // Publishing the views.
             /*$this->publishes([
                 __DIR__.'/../resources/views' => resource_path('views/vendor/gateway'),
