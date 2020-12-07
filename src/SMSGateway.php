@@ -47,7 +47,6 @@ class SMSGateway
 
     public static function Send($phonenumber, $message)
     {
-
         $OsonSMSLog = new OsonSMSLog();
         $OsonSMSLog->login = config('smsgateway.login');
         $OsonSMSLog->sender_name = config('smsgateway.sender_name');
@@ -77,5 +76,23 @@ class SMSGateway
             return true;
         else
             return false;
+    }
+
+    public static function getBalance()
+    {
+        $dlm = ";";
+        $txn_id = uniqid('osonsms_laravel_', true);
+        $str_hash = hash('sha256',$txn_id.$dlm.config('smsgateway.login').$dlm.config('smsgateway.hash'));
+        $parameters = array(
+            "str_hash" => $str_hash,
+            "txn_id" => $txn_id,
+            "login"=>config('smsgateway.login'),
+        );
+        $result = static::SendRequest("GET", config('smsgateway.server_url').'/check_balance.php', $parameters);
+        if ((isset($result['error']) && $result['error'] == 0)){
+            $response = json_decode($result['msg']);
+            return $response->balance;
+        }else
+            return 0;
     }
 }
