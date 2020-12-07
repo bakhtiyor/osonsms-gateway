@@ -12,26 +12,39 @@ This is where your description should go. Try and limit it to a paragraph or two
 You can install the package via composer:
 
 ```bash
-composer require osonsms/smsgateway
-```
-Run following command to publish migration and config files of the package:
-```bash
-php artisan vendor:publish --provider="OsonSMS\SMSGateway\SMSGatewayServiceProvider" --tag="migrations"
-php artisan vendor:publish --provider="OsonSMS\SMSGateway\SMSGatewayServiceProvider" --tag="config"
-php artisan migrate
+composer require osonsms/gateway
 ```
 ## Usage
 
-``` php
-// Usage description here
-Open config/smsgateway.php config file and set `login`, `hash` and `sender_name` parameters.
+Run following command to publish a migration file:
+```bash
+php artisan vendor:publish --provider="OsonSMS\SMSGateway\SMSGatewayServiceProvider" --tag="migrations"
 ```
-
-### Testing
-
-``` bash
-composer test
+Run ```php artisan migrate``` to create a necessary package table.
+ 
+To create a config file in order to specify OsonSMS credentials run following command:
+```bash
+php artisan vendor:publish --provider="OsonSMS\SMSGateway\SMSGatewayServiceProvider" --tag="config"
 ```
+Open config/smsgateway.php config file and specify following parameters:
+* login - Login from OsonSMS
+* hash  - Hash string 
+* sender_name - SMS Sender Name assigned to you
+
+You can send SMS in your Laravel code using folowing code:
+```
+$result = SMSGateway::Send('927777777', 'This is my test message from Laravel!');
+if ($result)
+    echo "SMS has been sent succesfully";
+else
+    echo "When sending SMS an error occurred";
+``` 
+
+You can find the logs of your SMS in the table called ```osonsms_log```.
+
+To check your balance use following code ```SMSGateway::getBalance()``` which returns a decimal number, indicating your balance in Somoni.
+
+If you have any further questions or recommendations, feel free to send us an email at info@osonsms.com. 
 
 ### Changelog
 
