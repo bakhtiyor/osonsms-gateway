@@ -2,7 +2,8 @@
 
 namespace OsonSMS\SMSGateway;
 
-use Osonsms\Gateway\Models\OsonSMSLog;
+
+use OsonSMS\SMSGateway\Models\OsonSMSLog;
 
 class SMSGateway
 {
@@ -49,24 +50,24 @@ class SMSGateway
     {
 
         $OsonSMSLog = new OsonSMSLog();
-        $OsonSMSLog->login = config('gateway.login');
-        $OsonSMSLog->sender_name = config('gateway.sender_name');
+        $OsonSMSLog->login = config('smsgateway.login');
+        $OsonSMSLog->sender_name = config('smsgateway.sender_name');
         $OsonSMSLog->message = $message;
         $OsonSMSLog->phonenumber = $phonenumber;
         $OsonSMSLog->save();
 
         $dlm = ";";
         $txn_id = "osonsms_laravel_".$OsonSMSLog->id;
-        $str_hash = hash('sha256',$txn_id.$dlm.config('gateway.login').$dlm.config('gateway.sender_name').$dlm.$phonenumber.$dlm.config('gateway.hash'));
+        $str_hash = hash('sha256',$txn_id.$dlm.config('smsgateway.login').$dlm.config('smsgateway.sender_name').$dlm.$phonenumber.$dlm.config('smsgateway.hash'));
         $parameters = array(
-            "from" => config('gateway.sender_name'),
+            "from" => config('smsgateway.sender_name'),
             "phone_number" => $phonenumber,
             "msg" => $message,
             "str_hash" => $str_hash,
             "txn_id" => $txn_id,
-            "login"=>config('gateway.login'),
+            "login"=>config('smsgateway.login'),
         );
-        $result = static::SendRequest("GET", config('gateway.server_url').'/sendsms_v1.php', $parameters);
+        $result = static::SendRequest("GET", config('smsgateway.server_url').'/sendsms_v1.php', $parameters);
         $_OsonSMSLog = OsonSMSLog::findOrFail($OsonSMSLog->id);
         $_OsonSMSLog->server_response = $result['msg'];
         $_OsonSMSLog->is_sent = 1;
