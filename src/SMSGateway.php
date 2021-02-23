@@ -45,7 +45,7 @@ class SMSGateway
         return $result;
     }
 
-    public static function Send($phonenumber, $message)
+    public static function Send($phonenumber, $message, $txn_id)
     {
         $OsonSMSLog = new OsonSMSLog();
         $OsonSMSLog->login = config('smsgateway.login');
@@ -55,7 +55,6 @@ class SMSGateway
         $OsonSMSLog->save();
 
         $dlm = ";";
-        $txn_id = "osonsms_laravel_".$OsonSMSLog->id;
         $str_hash = hash('sha256',$txn_id.$dlm.config('smsgateway.login').$dlm.config('smsgateway.sender_name').$dlm.$phonenumber.$dlm.config('smsgateway.hash'));
         $parameters = array(
             "from" => config('smsgateway.sender_name'),

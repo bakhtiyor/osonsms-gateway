@@ -33,7 +33,8 @@ Open config/smsgateway.php config file and specify following parameters:
 
 You can send SMS in your Laravel code using folowing code:
 ```
-$result = SMSGateway::Send('927777777', 'This is my test message from Laravel!');
+$txn_id = uniqid();
+$result = SMSGateway::Send('927777777', 'This is my test message from Laravel!', $txn_id);
 if ($result)
     echo "SMS has been sent succesfully";
 else
