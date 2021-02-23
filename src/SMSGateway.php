@@ -68,9 +68,13 @@ class SMSGateway
         $result = static::SendRequest("GET", config('smsgateway.server_url').'/sendsms_v1.php', $parameters);
         $_OsonSMSLog = OsonSMSLog::findOrFail($OsonSMSLog->id);
         $_OsonSMSLog->server_response = $result['msg'];
-        $response = json_decode($result['msg']);
-        $_OsonSMSLog->msgid = $response->msg_id;
-        $_OsonSMSLog->is_sent = 1;
+        if ($result['error']==0){
+            $response = json_decode($result['msg']);
+            $_OsonSMSLog->msgid = $response->msg_id;
+            $_OsonSMSLog->is_sent = 1;
+        }else{
+            $_OsonSMSLog->is_sent = 0;
+        }
         $_OsonSMSLog->update();
         if ((isset($result['error']) && $result['error'] == 0))
             return true;
