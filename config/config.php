@@ -7,5 +7,5 @@ return [
     'login' => 'YOUR_LOGIN',                                    // your login in OsonSMS platform
     'hash' => 'YOUR_HASH',                                      // your hash code in OsonSMS platform
     'sender_name' => 'OsonSMS',                                 // the name of your SMS sender
-    'server_url' => 'http://api.osonsms.com'                   // OsonSMS api server URL
+    'server_url' => 'https://api.osonsms.com'                   // OsonSMS api server URL
 ];
