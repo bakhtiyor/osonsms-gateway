@@ -4,6 +4,7 @@ namespace OsonSMS\SMSGateway;
 
 
 use GuzzleHttp\Exception\ClientException;
+use JsonException;
 use OsonSMS\SMSGateway\Models\OsonSMSLog;
 use GuzzleHttp\Client;
 use RuntimeException;
@@ -23,11 +24,11 @@ class SMSGateway
         $this->passSaltHash = config('smsgateway.pass_salt_hash');
     }
 
-    public function sendSMS(string $senderName, string $phonenumber, string $message, string $txnId): bool
+    public function sendSMS(string $senderName, string $phonenumber, string $message, string $txnId): int
     {
         $OsonSMSLog = new OsonSMSLog();
         $OsonSMSLog->login = $this->smsLogin;
-        $OsonSMSLog->sender_name = config('smsgateway.sender_name');
+        $OsonSMSLog->sender_name = $senderName;
         $OsonSMSLog->message = $message;
         $OsonSMSLog->phonenumber = $phonenumber;
 
@@ -48,13 +49,15 @@ class SMSGateway
             $OsonSMSLog->msgid = $responseBody['msg_id'];
             $OsonSMSLog->is_sent = 1;
             $OsonSMSLog->save();
-            return true;
+            return $responseBody['msg_id'];
         } catch (ClientException $exception) {
             $responseBody = json_decode($exception->getResponse()->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
             $OsonSMSLog->server_response = $responseBody['error']['msg'];
             $OsonSMSLog->is_sent = 0;
             $OsonSMSLog->save();
-            return false;
+            throw new RuntimeException($exception->getMessage());
+        } catch (JsonException $jsonException) {
+            throw new RuntimeException($jsonException->getMessage());
         }
     }
 
@@ -74,6 +77,8 @@ class SMSGateway
             return $responseBody['balance'];
         } catch (ClientException $exception) {
             throw new RuntimeException($exception->getMessage());
+        } catch (JsonException $jsonException) {
+            throw new RuntimeException($jsonException->getMessage());
         }
     }
 
@@ -94,6 +99,8 @@ class SMSGateway
             return $responseBody['message_state'];
         } catch (ClientException $exception) {
             throw new RuntimeException($exception->getMessage());
+        } catch (JsonException $jsonException) {
+            throw new RuntimeException($jsonException->getMessage());
         }
     }
 }
