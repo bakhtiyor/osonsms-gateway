@@ -3,99 +3,97 @@
 namespace OsonSMS\SMSGateway;
 
 
+use GuzzleHttp\Exception\ClientException;
 use OsonSMS\SMSGateway\Models\OsonSMSLog;
+use GuzzleHttp\Client;
+use RuntimeException;
 
 class SMSGateway
 {
-    public static function SendRequest($type, $url, $parameters)
+    private string $serverUrl;
+    private string $smsLogin;
+    private string $passSaltHash;
+    private Client $httpClient;
+
+    public function __construct()
     {
-        $curl = curl_init();
-        $data = http_build_query ($parameters);
-        if ($type == "GET") {
-            curl_setopt ($curl, CURLOPT_URL, "$url?$data");
-        }else if($type == "POST"){
-            curl_setopt ($curl, CURLOPT_URL, $url);
-            curl_setopt ($curl, CURLOPT_POSTFIELDS, $data);
-        }
-        curl_setopt_array($curl, array(
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => "",
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 30,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => $type
-        ));
-        $response = curl_exec($curl);
-        $err = curl_error($curl);
-        curl_close($curl);
-        $result = array();
-        if ($err) {
-            $result['error'] = 1;
-            $result['msg'] = $err;
-        } else {
-            $res = json_decode($response);
-            if (isset($res->error)){
-                $result['error'] = 1;
-                $result['msg'] = "Error Code: ". $res->error->code . " Message: " . $res->error->msg;
-            }else{
-                $result['error'] = 0;
-                $result['msg'] = $response;
-            }
-        }
-        return $result;
+        $this->httpClient = new Client();
+        $this->serverUrl = config('smsgateway.server_url');
+        $this->smsLogin = config('smsgateway.login');
+        $this->passSaltHash = config('smsgateway.pass_salt_hash');
     }
 
-    public static function Send($phonenumber, $message, $txn_id)
+    public function sendSMS(string $senderName, string $phonenumber, string $message, string $txnId): bool
     {
         $OsonSMSLog = new OsonSMSLog();
-        $OsonSMSLog->login = config('smsgateway.login');
+        $OsonSMSLog->login = $this->smsLogin;
         $OsonSMSLog->sender_name = config('smsgateway.sender_name');
         $OsonSMSLog->message = $message;
         $OsonSMSLog->phonenumber = $phonenumber;
-        $OsonSMSLog->save();
 
         $dlm = ";";
-        $str_hash = hash('sha256',$txn_id.$dlm.config('smsgateway.login').$dlm.config('smsgateway.sender_name').$dlm.$phonenumber.$dlm.config('smsgateway.hash'));
-        $parameters = array(
-            "from" => config('smsgateway.sender_name'),
+        $strHash = hash('sha256',$txnId.$dlm.$this->smsLogin.$dlm.$senderName.$dlm.$phonenumber.$dlm.$this->passSaltHash);
+        $queryParams = [
+            "from" => $senderName,
             "phone_number" => $phonenumber,
             "msg" => $message,
-            "str_hash" => $str_hash,
-            "txn_id" => $txn_id,
-            "login"=>config('smsgateway.login'),
-        );
-        $result = static::SendRequest("GET", config('smsgateway.server_url').'/sendsms_v1.php', $parameters);
-        $_OsonSMSLog = OsonSMSLog::findOrFail($OsonSMSLog->id);
-        $_OsonSMSLog->server_response = $result['msg'];
-        if ($result['error']==0){
-            $response = json_decode($result['msg']);
-            $_OsonSMSLog->msgid = $response->msg_id;
-            $_OsonSMSLog->is_sent = 1;
-        }else{
-            $_OsonSMSLog->is_sent = 0;
-        }
-        $_OsonSMSLog->update();
-        if ((isset($result['error']) && $result['error'] == 0))
+            "str_hash" => $strHash,
+            "txn_id" => $txnId,
+            "login" => $this->smsLogin,
+        ];
+        try {
+            $response = $this->httpClient->get($this->serverUrl . '/sendsms_v1.php', ['query' => $queryParams]);
+            $responseBody = json_decode($response->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
+            $OsonSMSLog->server_response = $response->getBody()->getContents();
+            $OsonSMSLog->msgid = $responseBody['msg_id'];
+            $OsonSMSLog->is_sent = 1;
+            $OsonSMSLog->save();
             return true;
-        else
+        } catch (ClientException $exception) {
+            $responseBody = json_decode($exception->getResponse()->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
+            $OsonSMSLog->server_response = $responseBody['error']['msg'];
+            $OsonSMSLog->is_sent = 0;
+            $OsonSMSLog->save();
             return false;
+        }
     }
 
-    public static function getBalance()
+    public function getBalance(): float
     {
         $dlm = ";";
-        $txn_id = uniqid('osonsms_laravel_', true);
-        $str_hash = hash('sha256',$txn_id.$dlm.config('smsgateway.login').$dlm.config('smsgateway.hash'));
-        $parameters = array(
-            "str_hash" => $str_hash,
-            "txn_id" => $txn_id,
-            "login"=>config('smsgateway.login'),
+        $txnId = uniqid('osonsms_laravel_', true);
+        $strHash = hash('sha256',$txnId.$dlm.$this->smsLogin.$dlm.$this->passSaltHash);
+        $queryParams = array(
+            "str_hash" => $strHash,
+            "txn_id" => $txnId,
+            "login"=>$this->smsLogin,
         );
-        $result = static::SendRequest("GET", config('smsgateway.server_url').'/check_balance.php', $parameters);
-        if ((isset($result['error']) && $result['error'] == 0)){
-            $response = json_decode($result['msg']);
-            return $response->balance;
-        }else
-            return 0;
+        try {
+            $response = $this->httpClient->get($this->serverUrl . '/check_balance.php', ['query' => $queryParams]);
+            $responseBody = json_decode($response->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
+            return $responseBody['balance'];
+        } catch (ClientException $exception) {
+            throw new RuntimeException($exception->getMessage());
+        }
+    }
+
+    public function getSMSStatus(int $msgId): string
+    {
+        $dlm = ";";
+        $txnId = uniqid('osonsms_laravel_', true);
+        $strHash = hash('sha256',$this->smsLogin.$dlm.$txnId.$dlm.$this->passSaltHash);
+        $queryParams = array(
+            "str_hash" => $strHash,
+            "txn_id" => $txnId,
+            "login"=>$this->smsLogin,
+            "msg_id"=>$msgId,
+        );
+        try {
+            $response = $this->httpClient->get($this->serverUrl . '/query_sms.php', ['query' => $queryParams]);
+            $responseBody = json_decode($response->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
+            return $responseBody['message_state'];
+        } catch (ClientException $exception) {
+            throw new RuntimeException($exception->getMessage());
+        }
     }
 }
