@@ -32,7 +32,7 @@ Open ```config/osonsmsservice.php``` config file and specify following parameter
 Below you can find a console command created in Laravel in order to test OsonSMS service. 
 Run ```php artisan app:test-osonsms-service``` in the terminal to see it in action, 
 don't forget to run previous commands to publish migration file and create config file.     
-```
+```php
 <?php
 
 namespace App\Console\Commands;
