@@ -19,9 +19,9 @@ class OsonSmsService
     public function __construct()
     {
         $this->httpClient = new Client();
-        $this->serverUrl = config('smsgateway.server_url');
-        $this->smsLogin = config('smsgateway.login');
-        $this->passSaltHash = config('smsgateway.pass_salt_hash');
+        $this->serverUrl = config('osonsmsservice.server_url');
+        $this->smsLogin = config('osonsmsservice.login');
+        $this->passSaltHash = config('osonsmsservice.pass_salt_hash');
     }
 
     public function sendSMS(string $senderName, string $phonenumber, string $message, string $txnId): int
