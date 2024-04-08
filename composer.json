@@ -39,10 +39,10 @@
     "extra": {
         "laravel": {
             "providers": [
-                "OsonSmsServiceProvider"
+                "OsonSMS\\OsonSMSService\\OsonSmsServiceProvider"
             ],
             "aliases": {
-                "OsonSMSService": "OsonSmsServiceFacade"
+                "OsonSMSService": "OsonSMS\\OsonSMSService\\OsonSmsServiceFacade"
             }
         }
     }
