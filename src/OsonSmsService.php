@@ -1,11 +1,11 @@
 <?php
 
-namespace OsonSMS\SMSGateway;
+namespace OsonSMS\OsonSMSService;
 
 
 use GuzzleHttp\Exception\ClientException;
 use JsonException;
-use OsonSMS\SMSGateway\Models\OsonSMSLog;
+use OsonSMS\OsonSMSService\Models\OsonSMSLog;
 use GuzzleHttp\Client;
 use RuntimeException;
 

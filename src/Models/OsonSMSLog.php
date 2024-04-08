@@ -1,5 +1,5 @@
 <?php
-namespace OsonSMS\SMSGateway\Models;
+namespace OsonSMS\OsonSMSService\Models;
 use Illuminate\Database\Eloquent\Model;
 
 class OsonSMSLog extends Model

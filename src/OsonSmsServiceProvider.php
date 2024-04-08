@@ -1,6 +1,6 @@
 <?php
 
-namespace OsonSMS\SMSGateway;
+namespace OsonSMS\OsonSMSService;
 
 use Illuminate\Support\ServiceProvider;
 
