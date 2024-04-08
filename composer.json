@@ -28,11 +28,6 @@
             "OsonSMS\\SMSGateway\\": "src"
         }
     },
-    "autoload-dev": {
-        "psr-4": {
-            "OsonSMS\\SMSGateway\\Tests\\": "tests"
-        }
-    },
     "scripts": {
         "test": "vendor/bin/phpunit",
         "test-coverage": "vendor/bin/phpunit --coverage-html coverage"
@@ -44,10 +39,10 @@
     "extra": {
         "laravel": {
             "providers": [
-                "OsonSMS\\SMSGateway\\SMSGatewayServiceProvider"
+                "OsonSmsServiceProvider"
             ],
             "aliases": {
-                "SMSGateway": "OsonSMS\\SMSGateway\\SMSGatewayFacade"
+                "OsonSMSService": "OsonSmsServiceFacade"
             }
         }
     }

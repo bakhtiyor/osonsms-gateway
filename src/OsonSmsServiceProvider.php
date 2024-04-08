@@ -4,7 +4,7 @@ namespace OsonSMS\SMSGateway;
 
 use Illuminate\Support\ServiceProvider;
 
-class SMSGatewayServiceProvider extends ServiceProvider
+class OsonSmsServiceProvider extends ServiceProvider
 {
     /**
      * Bootstrap the application services.
@@ -13,7 +13,7 @@ class SMSGatewayServiceProvider extends ServiceProvider
     {
         if ($this->app->runningInConsole()) {
             $this->publishes([
-                __DIR__.'/../config/config.php' => config_path('smsgateway.php'),
+                __DIR__.'/../config/config.php' => config_path('osonsmsservice.php'),
             ], 'config');
 
             // Export the migration
@@ -32,11 +32,11 @@ class SMSGatewayServiceProvider extends ServiceProvider
     public function register()
     {
         // Automatically apply the package configuration
-        $this->mergeConfigFrom(__DIR__.'/../config/config.php', 'smsgateway');
+        $this->mergeConfigFrom(__DIR__.'/../config/config.php', 'osonsmsservice');
 
         // Register the main class to use with the facade
-        $this->app->singleton('smsgateway', function () {
-            return new SMSGateway;
+        $this->app->singleton('osonsmsservice', function () {
+            return new OsonSmsService;
         });
     }
 }

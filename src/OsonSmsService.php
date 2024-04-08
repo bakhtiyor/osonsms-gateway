@@ -9,7 +9,7 @@ use OsonSMS\SMSGateway\Models\OsonSMSLog;
 use GuzzleHttp\Client;
 use RuntimeException;
 
-class SMSGateway
+class OsonSmsService
 {
     private string $serverUrl;
     private string $smsLogin;
@@ -44,15 +44,15 @@ class SMSGateway
         ];
         try {
             $response = $this->httpClient->get($this->serverUrl . '/sendsms_v1.php', ['query' => $queryParams]);
-            $responseBody = json_decode($response->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
+            $responseBody = json_decode($response->getBody()->getContents(), false, 512, JSON_THROW_ON_ERROR);
             $OsonSMSLog->server_response = $response->getBody()->getContents();
-            $OsonSMSLog->msgid = $responseBody['msg_id'];
+            $OsonSMSLog->msgid = $responseBody->msg_id;
             $OsonSMSLog->is_sent = 1;
             $OsonSMSLog->save();
-            return $responseBody['msg_id'];
+            return $responseBody->msg_id;
         } catch (ClientException $exception) {
-            $responseBody = json_decode($exception->getResponse()->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
-            $OsonSMSLog->server_response = $responseBody['error']['msg'];
+            $responseBody = json_decode($exception->getResponse()->getBody()->getContents(), false, 512, JSON_THROW_ON_ERROR);
+            $OsonSMSLog->server_response = $responseBody->error->msg;
             $OsonSMSLog->is_sent = 0;
             $OsonSMSLog->save();
             throw new RuntimeException($exception->getMessage());
@@ -73,8 +73,8 @@ class SMSGateway
         );
         try {
             $response = $this->httpClient->get($this->serverUrl . '/check_balance.php', ['query' => $queryParams]);
-            $responseBody = json_decode($response->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
-            return $responseBody['balance'];
+            $responseBody = json_decode($response->getBody()->getContents(), false, 512, JSON_THROW_ON_ERROR);
+            return $responseBody->balance;
         } catch (ClientException $exception) {
             throw new RuntimeException($exception->getMessage());
         } catch (JsonException $jsonException) {
@@ -95,8 +95,8 @@ class SMSGateway
         );
         try {
             $response = $this->httpClient->get($this->serverUrl . '/query_sms.php', ['query' => $queryParams]);
-            $responseBody = json_decode($response->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
-            return $responseBody['message_state'];
+            $responseBody = json_decode($response->getBody()->getContents(), false, 512, JSON_THROW_ON_ERROR);
+            return $responseBody->message_state;
         } catch (ClientException $exception) {
             throw new RuntimeException($exception->getMessage());
         } catch (JsonException $jsonException) {
