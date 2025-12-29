@@ -13,7 +13,7 @@ class OsonSmsService
 {
     private string $serverUrl;
     private string $smsLogin;
-    private string $passSaltHash;
+    private string $bearerToken;
     private Client $httpClient;
 
     public function __construct()
@@ -21,7 +21,7 @@ class OsonSmsService
         $this->httpClient = new Client();
         $this->serverUrl = config('osonsmsservice.server_url');
         $this->smsLogin = config('osonsmsservice.login');
-        $this->passSaltHash = config('osonsmsservice.pass_salt_hash');
+        $this->bearerToken = config('osonsmsservice.bearer_token');
     }
 
     public function sendSMS(string $senderName, string $phonenumber, string $message, string $txnId): int
@@ -32,18 +32,20 @@ class OsonSmsService
         $OsonSMSLog->message = $message;
         $OsonSMSLog->phonenumber = $phonenumber;
 
-        $dlm = ";";
-        $strHash = hash('sha256',$txnId.$dlm.$this->smsLogin.$dlm.$senderName.$dlm.$phonenumber.$dlm.$this->passSaltHash);
         $queryParams = [
             "from" => $senderName,
             "phone_number" => $phonenumber,
             "msg" => $message,
-            "str_hash" => $strHash,
             "txn_id" => $txnId,
             "login" => $this->smsLogin,
         ];
         try {
-            $response = $this->httpClient->get($this->serverUrl . '/sendsms_v1.php', ['query' => $queryParams]);
+            $response = $this->httpClient->get($this->serverUrl . '/sendsms_v1.php', [
+                'query' => $queryParams,
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->bearerToken,
+                ]
+            ]);
             $responseBody = json_decode($response->getBody()->getContents(), false, 512, JSON_THROW_ON_ERROR);
             $OsonSMSLog->server_response = $response->getBody()->getContents();
             $OsonSMSLog->msgid = $responseBody->msg_id;
@@ -63,16 +65,18 @@ class OsonSmsService
 
     public function getBalance(): float
     {
-        $dlm = ";";
         $txnId = uniqid('osonsms_laravel_', true);
-        $strHash = hash('sha256',$txnId.$dlm.$this->smsLogin.$dlm.$this->passSaltHash);
         $queryParams = array(
-            "str_hash" => $strHash,
             "txn_id" => $txnId,
-            "login"=>$this->smsLogin,
+            "login" => $this->smsLogin,
         );
         try {
-            $response = $this->httpClient->get($this->serverUrl . '/check_balance.php', ['query' => $queryParams]);
+            $response = $this->httpClient->get($this->serverUrl . '/check_balance.php', [
+                'query' => $queryParams,
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->bearerToken,
+                ]
+            ]);
             $responseBody = json_decode($response->getBody()->getContents(), false, 512, JSON_THROW_ON_ERROR);
             return $responseBody->balance;
         } catch (ClientException $exception) {
@@ -84,17 +88,19 @@ class OsonSmsService
 
     public function getSMSStatus(int $msgId): string
     {
-        $dlm = ";";
         $txnId = uniqid('osonsms_laravel_', true);
-        $strHash = hash('sha256',$this->smsLogin.$dlm.$txnId.$dlm.$this->passSaltHash);
         $queryParams = array(
-            "str_hash" => $strHash,
             "txn_id" => $txnId,
-            "login"=>$this->smsLogin,
-            "msg_id"=>$msgId,
+            "login" => $this->smsLogin,
+            "msg_id" => $msgId,
         );
         try {
-            $response = $this->httpClient->get($this->serverUrl . '/query_sms.php', ['query' => $queryParams]);
+            $response = $this->httpClient->get($this->serverUrl . '/query_sms.php', [
+                'query' => $queryParams,
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->bearerToken,
+                ]
+            ]);
             $responseBody = json_decode($response->getBody()->getContents(), false, 512, JSON_THROW_ON_ERROR);
             return $responseBody->message_state;
         } catch (ClientException $exception) {

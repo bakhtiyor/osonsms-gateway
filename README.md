@@ -25,8 +25,8 @@ To create a config file in order to specify OsonSMS credentials run following co
 php artisan vendor:publish --provider="OsonSMS\OsonSMSService\OsonSmsServiceProvider" --tag="config"
 ```
 Open ```config/osonsmsservice.php``` config file and specify following parameters:
-* login - Login from OsonSMS
-* pass_salt_hash  - You pass salt hash string given after the registration, it is kind of api token 
+* login - Your login in OsonSMS platform
+* bearer_token - Your Bearer token from OsonSMS platform (obtained after registration)
 * sender_name - SMS Sender Name assigned to you
 
 Below you can find a console command created in Laravel in order to test OsonSMS service. 

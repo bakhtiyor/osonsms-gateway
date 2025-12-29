@@ -5,7 +5,7 @@
  */
 return [
     'login' => 'YOUR_LOGIN',                                    // your login in OsonSMS platform
-    'pass_salt_hash' => 'YOUR_PASS_SALT_HASH',                  // your hash code in OsonSMS platform
+    'bearer_token' => 'YOUR_BEARER_TOKEN',                      // your Bearer token from OsonSMS platform
     'sender_name' => 'OsonSMS',                                 // the name of your SMS sender
     'server_url' => 'https://api.osonsms.com'                   // OsonSMS api server URL
 ];
