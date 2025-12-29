@@ -30,8 +30,8 @@ Open ```config/osonsmsservice.php``` config file and specify following parameter
 * sender_name - SMS Sender Name assigned to you
 
 Below you can find a console command created in Laravel in order to test OsonSMS service. 
-Run ```php artisan app:test-osonsms-service``` in the terminal to see it in action, 
-don't forget to run previous commands to publish migration file and create config file.     
+Create a command using ```php artisan make:command TestOsonSMSServiceCommand``` in order to create a test command. Find it in the project folder and copy paste following code.
+     
 ```php
 <?php
 
@@ -71,6 +71,9 @@ class TestOsonSMSServiceCommand extends Command
 }
 
 ``` 
+
+Run ```php artisan app:test-osonsms-service``` in the terminal to see it in action, 
+don't forget to run previous commands to publish migration file and create config file.
 
 You can find the logs of your SMS in the table called ```osonsms_log```.
 
